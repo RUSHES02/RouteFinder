@@ -40,5 +40,4 @@ fun constructUrl(url: String): String {
 		url.startsWith("/") -> BuildConfig.BASE_URL + url
 		else -> BuildConfig.BASE_URL + "/" + url
 	}
-//	return ""
 }
