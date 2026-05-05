@@ -13,6 +13,7 @@ coilCompose = "3.4.0"
 hilt = "2.59.2"
 compose-material-icons-extended = "1.7.8"
 navigationCompose = "2.9.8"
+playServicesMaps = "20.0.0"
 securityCrypto = "1.1.0"
 accompanistPermissions = "0.37.3"
 ksp = "2.3.2"
@@ -60,6 +61,7 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 
 # Room
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 

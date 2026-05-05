@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 //    alias(libs.plugins.kotlin.android)
@@ -32,6 +34,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        debug {
+            android.buildFeatures.buildConfig = true
+            val properties = Properties()
+            properties.load(project.rootProject.file("local.properties").inputStream())
+            buildConfigField("String", "MAPS_API_KEY", "\"${properties.getProperty("MAPS_API_KEY")}\"")
+            manifestPlaceholders["maps_api_key"] = properties.getProperty("MAPS_API_KEY")
         }
     }
     compileOptions {
@@ -91,6 +101,5 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
 
-
-//    implementation(libs.crop.kit)
+    implementation(libs.play.services.maps)
 }
