@@ -14,7 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URLEncoder
 
-class GoogleMapsApiImpl(
+class GoogleMapsDataSource(
     private val client: HttpClient,
     private val apiKey: String
 )  {
