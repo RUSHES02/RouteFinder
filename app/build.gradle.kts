@@ -82,7 +82,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
-//icons
+    //icons
     implementation(libs.compose.material.icons.extended)
     //coil
     implementation(libs.coil.compose)
@@ -102,4 +102,5 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
 }
