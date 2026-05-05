@@ -40,7 +40,7 @@ android {
             android.buildFeatures.buildConfig = true
             val properties = Properties()
             properties.load(project.rootProject.file("local.properties").inputStream())
-            buildConfigField("String", "MAPS_API_KEY", "\"${properties.getProperty("MAPS_API_KEY")}\"")
+            buildConfigField("String", "BASE_URL", "\"${properties.getProperty("BASE_URL")}\"")
             manifestPlaceholders["maps_api_key"] = properties.getProperty("MAPS_API_KEY")
         }
     }
@@ -82,6 +82,8 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
+    //ktor
+    implementation(libs.bundles.ktor)
     //icons
     implementation(libs.compose.material.icons.extended)
     //coil
@@ -100,7 +102,7 @@ dependencies {
     //room
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
-
+    //maps
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
 }
