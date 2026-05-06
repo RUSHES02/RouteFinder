@@ -111,13 +111,15 @@ fun MapScreen(
         }
 
         state.routeInfo?.let {
-            RouteInfoCard(
-                routeInfo = state.routeInfo,
-                onStartClick = onStartRide,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
-            )
+//            if (state.shouldStartTraversal) {
+                RouteInfoCard(
+                    routeInfo = it,
+                    onStartClick = onStartRide,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                )
+//            }
         }
     }
 }

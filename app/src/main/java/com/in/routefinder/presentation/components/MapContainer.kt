@@ -1,26 +1,36 @@
 package com.`in`.routefinder.presentation.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.`in`.routefinder.presentation.model.LocationUi
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlin.math.atan2
 
 @Composable
 fun MapContainer(
@@ -32,7 +42,8 @@ fun MapContainer(
     routePoints: List<LatLng>,
     shouldStartTraversal: Boolean
 ) {
-    // ---------------- MAP UI SETTINGS ----------------
+
+    // ---------------- MAP SETTINGS ----------------
     val mapUiSettings = remember {
         MapUiSettings(
             zoomControlsEnabled = false,
@@ -46,15 +57,10 @@ fun MapContainer(
         )
     }
 
-    // ---------------- MAP PROPERTIES ----------------
     val mapProperties = remember(isPermissionGranted) {
         MapProperties(
             isMyLocationEnabled = isPermissionGranted,
             mapType = MapType.NORMAL,
-//            mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
-//                context,
-//                R.raw.map_style_json
-//            ),
             latLngBoundsForCameraTarget = LatLngBounds(
                 LatLng(8.07, 68.12),
                 LatLng(37.1, 97.42)
@@ -66,7 +72,15 @@ fun MapContainer(
 
     // ---------------- DEFAULT LOCATION ----------------
     val defaultLocation = remember {
-        LatLng(12.9716, 77.5946) // Bangalore fallback
+        LatLng(12.9716, 77.5946)
+    }
+
+    // ---------------- INITIAL VEHICLE POSITION ----------------
+
+    val initialVehiclePosition = remember(routePoints) {
+        routePoints.firstOrNull()
+            ?: currentLocation
+            ?: defaultLocation
     }
 
     // ---------------- CAMERA ----------------
@@ -77,14 +91,29 @@ fun MapContainer(
         )
     }
 
-    // ---------------- VEHICLE MARKER ----------------
-    val vehicleMarkerState = remember {
-        MarkerState(
-            position = currentLocation ?: defaultLocation
-        )
+    // ---------------- ANIMATION ----------------
+    val animatedLat = remember {
+        Animatable(initialVehiclePosition.latitude.toFloat())
     }
 
-    // ---------------- MOVE CAMERA TO CURRENT LOCATION ----------------
+    val animatedLng = remember {
+        Animatable(initialVehiclePosition.longitude.toFloat())
+    }
+
+    var vehicleRotation by remember {
+        mutableFloatStateOf(0f)
+    }
+
+    val animatedVehiclePosition by remember {
+        derivedStateOf {
+            LatLng(
+                animatedLat.value.toDouble(),
+                animatedLng.value.toDouble()
+            )
+        }
+    }
+
+    // ---------------- CAMERA TO CURRENT LOCATION ----------------
     LaunchedEffect(currentLocation) {
         currentLocation?.let {
             cameraPositionState.animate(
@@ -97,7 +126,7 @@ fun MapContainer(
         }
     }
 
-    // ---------------- CAMERA TO START LOCATION ----------------
+    // ---------------- CAMERA TO START ---------------
     LaunchedEffect(startLocation) {
         startLocation?.let {
             cameraPositionState.animate(
@@ -110,8 +139,9 @@ fun MapContainer(
         }
     }
 
-    // ---------------- FIT ROUTE BOUNDS ----------------
+    // ---------------- FIT ROUTE ----------------
     LaunchedEffect(routePoints) {
+
         if (routePoints.isEmpty()) return@LaunchedEffect
         val boundsBuilder = LatLngBounds.builder()
         routePoints.forEach {
@@ -126,47 +156,75 @@ fun MapContainer(
         )
     }
 
-    // ---------------- ROUTE ANIMATION ----------------
-    LaunchedEffect(routePoints, shouldStartTraversal) {
+    // ---------------- ROUTE TRAVERSAL ----------------
+    LaunchedEffect(
+        routePoints,
+        shouldStartTraversal
+    ) {
         if (!shouldStartTraversal) return@LaunchedEffect
 
         if (routePoints.size < 2) return@LaunchedEffect
+
         for (i in 0 until routePoints.lastIndex) {
+
             val start = routePoints[i]
             val end = routePoints[i + 1]
-            val steps = 30
-            for (step in 0..steps) {
-                val fraction = step / steps.toFloat()
-                val interpolatedPosition = interpolate(
-                    fraction = fraction,
-                    start = start,
-                    end = end
-                )
-                // Move vehicle marker
-                vehicleMarkerState.position = interpolatedPosition
-                // Smooth camera follow
-                cameraPositionState.position =
-                    CameraPosition.fromLatLngZoom(
-                        interpolatedPosition,
-                        15f
-                    )
 
-                delay(5L)
+            vehicleRotation = calculateBearing(
+                start,
+                end
+            )
+
+            coroutineScope {
+                launch {
+                    animatedLat.animateTo(
+                        targetValue = end.latitude.toFloat(),
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearEasing
+                        )
+                    )
+                }
+
+                launch {
+                    animatedLng.animateTo(
+                        targetValue = end.longitude.toFloat(),
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearEasing
+                        )
+                    )
+                }
             }
         }
     }
 
+    // ---------------- CAMERA FOLLOW ----------------
+    LaunchedEffect(animatedVehiclePosition) {
+        if (!shouldStartTraversal) return@LaunchedEffect
+
+        cameraPositionState.position =
+            CameraPosition.fromLatLngZoom(
+                animatedVehiclePosition,
+                16f
+            )
+    }
+
     // ---------------- MAP ----------------
+
     GoogleMap(
         modifier = modifier.fillMaxSize(),
         properties = mapProperties,
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState
     ) {
-        // ---------------- CURRENT LOCATION MARKER ----------------
+
+        // ---------------- CURRENT LOCATION ----------------
         currentLocation?.let {
             Marker(
-                state = rememberUpdatedMarkerState(position = it),
+                state = rememberUpdatedMarkerState(
+                    position = it
+                ),
                 title = "Current Location",
                 icon = BitmapDescriptorFactory.defaultMarker(
                     BitmapDescriptorFactory.HUE_AZURE
@@ -174,20 +232,21 @@ fun MapContainer(
             )
         }
 
-        // ---------------- START MARKER ----------------
+        // ---------------- START LOCATION ----------------
         startLocation?.let { start ->
-            Marker(
-                state = rememberUpdatedMarkerState(
-                    position = LatLng(
-                        start.lat,
-                        start.lng
-                    )
+            Circle(
+                center = LatLng(
+                    start.lat,
+                    start.lng
                 ),
-                title = start.name
+                radius = 18.0,
+                fillColor = Color.DarkGray,
+                strokeColor = Color.DarkGray,
+                strokeWidth = 4f
             )
         }
 
-        // ---------------- DESTINATION MARKER ----------------
+        // ---------------- DESTINATION ----------------
         destinationLocation?.let { destination ->
             Marker(
                 state = rememberUpdatedMarkerState(
@@ -200,35 +259,44 @@ fun MapContainer(
             )
         }
 
-        // ---------------- ROUTE POLYLINE ----------------
+        // ---------------- ROUTE ----------------
         if (routePoints.isNotEmpty()) {
+
             Polyline(
                 points = routePoints,
                 width = 12f
             )
         }
 
-        // ---------------- ANIMATED VEHICLE MARKER ----------------
+        // ---------------- VEHICLE ----------------
         if (routePoints.isNotEmpty()) {
             Marker(
-                state = vehicleMarkerState,
-                title = "Vehicle"
+                state = rememberUpdatedMarkerState(
+                    position = animatedVehiclePosition
+                ),
+                title = "Vehicle",
+                rotation = vehicleRotation,
+                flat = true,
+//                icon = BitmapDescriptorFactory.fromResource(
+//                    R.drawable.ic_car
+//                )
             )
         }
     }
 }
 
-/**
- * Smooth interpolation between two LatLng points
- */
-private fun interpolate(
-    fraction: Float,
+private fun calculateBearing(
     start: LatLng,
     end: LatLng
-): LatLng {
+): Float {
 
-    return LatLng(
-        start.latitude + (end.latitude - start.latitude) * fraction,
-        start.longitude + (end.longitude - start.longitude) * fraction
-    )
+    val latDiff = end.latitude - start.latitude
+    val lngDiff = end.longitude - start.longitude
+
+    return Math.toDegrees(
+        atan2(
+            lngDiff,
+            latDiff
+        )
+    ).toFloat()
 }

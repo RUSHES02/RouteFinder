@@ -10,15 +10,14 @@ import com.`in`.routefinder.data.remote.util.PolylineUtils
 import com.`in`.routefinder.domain.MapsRepository
 import com.`in`.routefinder.domain.model.Location
 import com.`in`.routefinder.domain.model.Route
+import com.`in`.routefinder.domain.model.RouteInfo
 import com.`in`.routefinder.domain.model.RoutePoint
 
 class MapsRepositoryImpl(
     private val dataSource: GoogleMapsDataSource
 ) : MapsRepository {
 
-    override suspend fun searchLocations(
-        query: String
-    ): Response<List<Location>, AppError> {
+    override suspend fun searchLocations(query: String): Response<List<Location>, AppError> {
 
         if (query.isBlank()) {
             return Response.Success(emptyList())
@@ -39,10 +38,7 @@ class MapsRepositoryImpl(
             .mapToAppError { it.toAppError() }
     }
 
-    override suspend fun getLocationDetails(
-        placeId: String,
-        name: String
-    ): Response<Location, AppError> {
+    override suspend fun getLocationDetails(placeId: String, name: String): Response<Location, AppError> {
 
         return dataSource.getPlaceDetails(placeId)
             .map { dto ->
@@ -58,27 +54,28 @@ class MapsRepositoryImpl(
             .mapToAppError { it.toAppError() }
     }
 
-    override suspend fun getRoute(
-        start: Location,
-        destination: Location
-    ): Response<Route, AppError> {
+    override suspend fun getRoute(start: Location, destination: Location): Response<Route, AppError> {
 
         val origin = "${start.latitude},${start.longitude}"
         val dest = "${destination.latitude},${destination.longitude}"
 
         return dataSource.getDirections(origin, dest)
             .map { dto ->
-
-                val polyline =
-                    dto.routes.firstOrNull()?.overview_polyline?.points.orEmpty()
-
-                val decoded = PolylineUtils.decode(polyline)
+                val route = dto.routes.firstOrNull()
+                val decoded = PolylineUtils.decode(route?.overview_polyline?.points.orEmpty())
+                val leg = route?.legs?.firstOrNull()
 
                 Route(
                     points = decoded.map {
                         RoutePoint(
                             latitude = it.latitude,
                             longitude = it.longitude
+                        )
+                    },
+                    routeInfo = leg?.let {
+                        RouteInfo(
+                            distanceText = it.distance.text,
+                            durationText = it.duration.text
                         )
                     }
                 )
