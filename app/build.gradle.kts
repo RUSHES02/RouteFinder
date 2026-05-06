@@ -40,6 +40,7 @@ android {
             android.buildFeatures.buildConfig = true
             val properties = Properties()
             properties.load(project.rootProject.file("local.properties").inputStream())
+            buildConfigField("String", "MAPS_API_KEY", "\"${properties.getProperty("MAPS_API_KEY")}\"")
             buildConfigField("String", "BASE_URL", "\"${properties.getProperty("BASE_URL")}\"")
             manifestPlaceholders["maps_api_key"] = properties.getProperty("MAPS_API_KEY")
         }
