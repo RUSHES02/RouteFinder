@@ -16,6 +16,8 @@ data class MapUiState(
     val selectedStart: LocationUi? = null,
     val selectedDestination: LocationUi? = null,
 
+    val currentLocation: LatLng? = null,
+
     val routePoints: List<LatLng> = emptyList(),
 
     val isLoading: Boolean = false,

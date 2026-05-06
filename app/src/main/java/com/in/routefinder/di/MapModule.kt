@@ -5,6 +5,9 @@ import com.`in`.routefinder.core.networking.HttpClientFactory
 import com.`in`.routefinder.data.remote.GoogleMapsDataSource
 import com.`in`.routefinder.data.repository.MapsRepositoryImpl
 import com.`in`.routefinder.domain.MapsRepository
+import com.`in`.routefinder.presentation.utils.CurrentLocationProvider
+import com.`in`.routefinder.presentation.utils.CurrentLocationProviderImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,4 +51,14 @@ object NetworkModule {
             apiKey = BuildConfig.MAPS_API_KEY
         )
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class LocationModule {
+
+    @Binds
+    abstract fun bindCurrentLocationProvider(
+        impl: CurrentLocationProviderImpl
+    ): CurrentLocationProvider
 }

@@ -8,6 +8,7 @@ import com.`in`.routefinder.domain.MapsRepository
 import com.`in`.routefinder.presentation.mapper.toDomain
 import com.`in`.routefinder.presentation.mapper.toUi
 import com.`in`.routefinder.presentation.model.LocationUi
+import com.`in`.routefinder.presentation.utils.CurrentLocationProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.FlowPreview
@@ -21,7 +22,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val repository: MapsRepository
+    private val repository: MapsRepository,
+    private val currentLocationProvider: CurrentLocationProvider
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MapUiState())
@@ -31,6 +33,20 @@ class MapViewModel @Inject constructor(
 
     init {
         observeSearch()
+    }
+
+    fun onLocationPermissionResult(
+        isGranted: Boolean
+    ) {
+        if (!isGranted) return
+        viewModelScope.launch {
+            val location = currentLocationProvider.getCurrentLocation()
+            _state.update {
+                it.copy(
+                    currentLocation = location
+                )
+            }
+        }
     }
 
     // -------------------------
