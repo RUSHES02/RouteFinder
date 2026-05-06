@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +20,9 @@ import com.`in`.routefinder.presentation.model.RouteInfoUi
 @Composable
 fun RouteInfoCard(
     routeInfo: RouteInfoUi,
+    isRideStarted: Boolean,
     onStartClick: () -> Unit,
+    onResetClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -29,7 +32,9 @@ fun RouteInfoCard(
     ) {
 
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
 
             Text(
@@ -47,11 +52,32 @@ fun RouteInfoCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = onStartClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Start Ride")
+            if (!isRideStarted) {
+
+                Button(
+                    onClick = onStartClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    Text("Start Ride")
+                }
+
+            } else {
+
+                Text(
+                    text = "Ride in Progress...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF2E7D32)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = onResetClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Reset")
+                }
             }
         }
     }

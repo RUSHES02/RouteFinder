@@ -1,10 +1,13 @@
 package com.`in`.routefinder.presentation.screen
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,12 +21,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import com.`in`.routefinder.presentation.components.MapContainer
+import com.`in`.routefinder.presentation.components.RideProgressHeader
 import com.`in`.routefinder.presentation.components.RouteInfoCard
 import com.`in`.routefinder.presentation.components.SearchCard
 import com.`in`.routefinder.presentation.components.SuggestionsSheet
 import com.`in`.routefinder.presentation.model.LocationUi
 import com.`in`.routefinder.presentation.viewModel.ActiveField
 import com.`in`.routefinder.presentation.viewModel.MapUiState
+import androidx.compose.animation.togetherWith
 
 @Composable
 fun MapScreen(
@@ -34,7 +39,8 @@ fun MapScreen(
     onDestinationQueryChange: (String) -> Unit,
     onStartSelected: (LocationUi) -> Unit,
     onDestinationSelected: (LocationUi) -> Unit,
-    onStartRide: () -> Unit
+    onStartRide: () -> Unit,
+    onResetRoute: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 //    val context = LocalContext.current
@@ -59,53 +65,86 @@ fun MapScreen(
         )
 
         // ---------------- OVERLAY CONTENT ----------------
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .statusBarsPadding()
-        ) {
-
-            // SEARCH CARD
-            SearchCard(
-                state = state,
-                onStartQueryChange = onStartQueryChange,
-                onDestinationQueryChange = onDestinationQueryChange,
-                modifier = Modifier
-                    .padding(
-                        horizontal = 16.dp,
-                        vertical = 16.dp
-                    )
-            )
-
-            // SUGGESTIONS
-            val suggestions =
-                when (state.activeField) {
-                    ActiveField.START -> state.startSuggestions
-                    ActiveField.DESTINATION -> state.destinationSuggestions
-                }
-
-            AnimatedVisibility(
-                visible = suggestions.isNotEmpty(),
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically()
-            ){
-
-                SuggestionsSheet(
-                    suggestions = suggestions,
-                    onItemClick = { location ->
-                        keyboardController?.hide()
-                        when (state.activeField) {
-                            ActiveField.START -> {
-                                onStartSelected(location)
-                            }
-
-                            ActiveField.DESTINATION -> {
-                                onDestinationSelected(location)
-                            }
+        AnimatedContent(
+            targetState = state.shouldStartTraversal,
+            transitionSpec = {
+                slideInVertically(
+                    initialOffsetY = { fullHeight ->
+                        -fullHeight
+                    }
+                ) + fadeIn() togetherWith(
+                    slideOutVertically(
+                        targetOffsetY = { fullHeight ->
+                            -fullHeight
                         }
-                    },
+                    ) + fadeOut()
+                )
+            },
+            label = "ride_ui_transition"
+        ) { isRideStarted ->
+            if (!isRideStarted) {
+                Column(
                     modifier = Modifier
-                        .padding(horizontal = 16.dp)
+                        .align(Alignment.TopCenter)
+                        .statusBarsPadding()
+                ) {
+                    // ---------------- SEARCH CARD ----------------
+                    SearchCard(
+                        state = state,
+                        onStartQueryChange = onStartQueryChange,
+                        onDestinationQueryChange = onDestinationQueryChange,
+                        modifier = Modifier
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 16.dp
+                            )
+                    )
+
+                    // ---------------- SUGGESTIONS ----------------
+                    val suggestions =
+                        when (state.activeField) {
+
+                            ActiveField.START ->
+                                state.startSuggestions
+
+                            ActiveField.DESTINATION ->
+                                state.destinationSuggestions
+                        }
+
+                    AnimatedVisibility(
+                        visible = suggestions.isNotEmpty(),
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        SuggestionsSheet(
+                            suggestions = suggestions,
+                            onItemClick = { location ->
+                                keyboardController?.hide()
+                                when (state.activeField) {
+                                    ActiveField.START -> {
+                                        onStartSelected(location)
+                                    }
+                                    ActiveField.DESTINATION -> {
+                                        onDestinationSelected(location)
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                        )
+                    }
+                }
+            } else {
+                RideProgressHeader(
+                    start = state.selectedStart?.name.orEmpty(),
+                    destination = state.selectedDestination?.name.orEmpty(),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .statusBarsPadding()
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 16.dp
+                        )
                 )
             }
         }
@@ -114,7 +153,9 @@ fun MapScreen(
 //            if (state.shouldStartTraversal) {
                 RouteInfoCard(
                     routeInfo = it,
+                    isRideStarted = state.shouldStartTraversal,
                     onStartClick = onStartRide,
+                    onResetClick = onResetRoute,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)
@@ -148,6 +189,7 @@ private fun MapScreenPreview() {
         onDestinationSelected = {},
         isPermissionGranted = true,
         currentLocation = null,
-        onStartRide = {}
+        onStartRide = {},
+        onResetRoute = {}
     )
 }

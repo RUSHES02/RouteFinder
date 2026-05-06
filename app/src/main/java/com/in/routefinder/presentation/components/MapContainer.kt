@@ -219,19 +219,6 @@ fun MapContainer(
         cameraPositionState = cameraPositionState
     ) {
 
-        // ---------------- CURRENT LOCATION ----------------
-        currentLocation?.let {
-            Marker(
-                state = rememberUpdatedMarkerState(
-                    position = it
-                ),
-                title = "Current Location",
-                icon = BitmapDescriptorFactory.defaultMarker(
-                    BitmapDescriptorFactory.HUE_AZURE
-                )
-            )
-        }
-
         // ---------------- START LOCATION ----------------
         startLocation?.let { start ->
             Circle(
@@ -239,7 +226,7 @@ fun MapContainer(
                     start.lat,
                     start.lng
                 ),
-                radius = 18.0,
+                radius = 25.0,
                 fillColor = Color.DarkGray,
                 strokeColor = Color.DarkGray,
                 strokeWidth = 4f
@@ -261,7 +248,6 @@ fun MapContainer(
 
         // ---------------- ROUTE ----------------
         if (routePoints.isNotEmpty()) {
-
             Polyline(
                 points = routePoints,
                 width = 12f

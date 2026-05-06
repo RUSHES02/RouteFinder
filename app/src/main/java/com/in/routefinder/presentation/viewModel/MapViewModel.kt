@@ -237,6 +237,24 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    fun onResetRoute() {
+        _state.update {
+            it.copy(
+                startQuery = "",
+                destinationQuery = "",
+                startSuggestions = emptyList(),
+                activeField = ActiveField.START,
+                destinationSuggestions = emptyList(),
+                selectedStart = null,
+                selectedDestination = null,
+                routePoints = emptyList(),
+                routeInfo = null,
+                shouldStartTraversal = false,
+                error = null
+            )
+        }
+    }
+
     // -------------------------
     // HELPERS
     // -------------------------

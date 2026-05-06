@@ -72,6 +72,7 @@ fun AppNavHost(
                 isPermissionGranted = locationPermissionState.status.isGranted,
                 onStartRide = viewModel::onStartRide,
                 currentLocation = state.currentLocation,
+                onResetRoute = viewModel::onResetRoute
             )
         }
     }
