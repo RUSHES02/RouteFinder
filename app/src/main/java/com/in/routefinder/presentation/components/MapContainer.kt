@@ -102,7 +102,7 @@ fun MapContainer(
         for (i in 0 until routePoints.lastIndex) {
             val start = routePoints[i]
             val end = routePoints[i + 1]
-            val steps = 20
+            val steps = 30
             for (step in 0..steps) {
                 val fraction = step / steps.toFloat()
                 val interpolatedPosition = interpolate(
@@ -119,7 +119,7 @@ fun MapContainer(
                         15f
                     )
 
-                delay(16L)
+                delay(5L)
             }
         }
     }
