@@ -1,7 +1,9 @@
 package com.`in`.routefinder.presentation.mapper
 
 import com.`in`.routefinder.domain.model.Location
+import com.`in`.routefinder.domain.model.RouteInfo
 import com.`in`.routefinder.presentation.model.LocationUi
+import com.`in`.routefinder.presentation.model.RouteInfoUi
 
 fun Location.toUi(): LocationUi {
     return LocationUi(
@@ -20,5 +22,12 @@ fun LocationUi.toDomain(): Location {
         address = address,
         latitude = lat,
         longitude = lng
+    )
+}
+
+fun RouteInfo.toUi(): RouteInfoUi {
+    return RouteInfoUi(
+        distanceText = distanceText,
+        durationText = durationText
     )
 }

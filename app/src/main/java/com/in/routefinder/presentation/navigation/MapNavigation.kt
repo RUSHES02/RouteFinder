@@ -70,6 +70,7 @@ fun AppNavHost(
                 onStartSelected = viewModel::onStartSelected,
                 onDestinationSelected = viewModel::onDestinationSelected,
                 isPermissionGranted = locationPermissionState.status.isGranted,
+                onStartRide = viewModel::onStartRide,
                 currentLocation = state.currentLocation,
             )
         }

@@ -199,23 +199,19 @@ class MapViewModel @Inject constructor(
 
     private fun fetchRoute(start: LocationUi, dest: LocationUi) {
         viewModelScope.launch {
-
             _state.update { it.copy(isLoading = true) }
-
             when (val result = repository.getRoute(
                 start = start.toDomain(),
                 destination = dest.toDomain()
             )) {
-
                 is Response.Success -> {
-
                     val points = result.data.points.map {
                         LatLng(it.latitude, it.longitude)
                     }
-
                     _state.update {
                         it.copy(
                             routePoints = points,
+                            routeInfo = result.data.routeInfo?.toUi(),
                             isLoading = false
                         )
                     }
@@ -230,6 +226,14 @@ class MapViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun onStartRide() {
+        _state.update {
+            it.copy(
+                shouldStartTraversal = true
+            )
         }
     }
 

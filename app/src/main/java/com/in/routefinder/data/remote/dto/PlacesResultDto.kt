@@ -12,7 +12,7 @@ data class PlaceResultDto(
     val geometry: GeometryDto
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class GeometryDto(
     val location: LatLngDto
 )

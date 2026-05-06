@@ -35,7 +35,6 @@ fun SuggestionsSheet(
     onItemClick: (LocationUi) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     ElevatedCard(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
@@ -43,15 +42,12 @@ fun SuggestionsSheet(
             defaultElevation = 6.dp
         )
     ) {
-
         LazyColumn(
             modifier = Modifier
                 .background(Color.White)
                 .fillMaxWidth()
         ) {
-
             items(suggestions) { item ->
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

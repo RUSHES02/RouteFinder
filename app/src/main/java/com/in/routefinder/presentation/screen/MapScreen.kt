@@ -1,6 +1,10 @@
 package com.`in`.routefinder.presentation.screen
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,10 +13,12 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.LatLng
 import com.`in`.routefinder.presentation.components.MapContainer
+import com.`in`.routefinder.presentation.components.RouteInfoCard
 import com.`in`.routefinder.presentation.components.SearchCard
 import com.`in`.routefinder.presentation.components.SuggestionsSheet
 import com.`in`.routefinder.presentation.model.LocationUi
@@ -27,26 +33,32 @@ fun MapScreen(
     onStartQueryChange: (String) -> Unit,
     onDestinationQueryChange: (String) -> Unit,
     onStartSelected: (LocationUi) -> Unit,
-    onDestinationSelected: (LocationUi) -> Unit
+    onDestinationSelected: (LocationUi) -> Unit,
+    onStartRide: () -> Unit
 ) {
-
+    val keyboardController = LocalSoftwareKeyboardController.current
+//    val context = LocalContext.current
+//    LaunchedEffect(state.error) {
+//        state.error?.let {
+//            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+//        }
+//    }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
 
         // ---------------- MAP ----------------
-
         MapContainer(
             modifier = Modifier.fillMaxSize(),
             isPermissionGranted = isPermissionGranted,
             currentLocation = currentLocation,
             startLocation = state.selectedStart,
             destinationLocation = state.selectedDestination,
-            routePoints = state.routePoints
+            routePoints = state.routePoints,
+            shouldStartTraversal = state.shouldStartTraversal
         )
 
         // ---------------- OVERLAY CONTENT ----------------
-
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -54,7 +66,6 @@ fun MapScreen(
         ) {
 
             // SEARCH CARD
-
             SearchCard(
                 state = state,
                 onStartQueryChange = onStartQueryChange,
@@ -67,7 +78,6 @@ fun MapScreen(
             )
 
             // SUGGESTIONS
-
             val suggestions =
                 when (state.activeField) {
                     ActiveField.START -> state.startSuggestions
@@ -75,15 +85,16 @@ fun MapScreen(
                 }
 
             AnimatedVisibility(
-                visible = suggestions.isNotEmpty()
-            ) {
+                visible = suggestions.isNotEmpty(),
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ){
 
                 SuggestionsSheet(
                     suggestions = suggestions,
                     onItemClick = { location ->
-
+                        keyboardController?.hide()
                         when (state.activeField) {
-
                             ActiveField.START -> {
                                 onStartSelected(location)
                             }
@@ -97,6 +108,16 @@ fun MapScreen(
                         .padding(horizontal = 16.dp)
                 )
             }
+        }
+
+        state.routeInfo?.let {
+            RouteInfoCard(
+                routeInfo = state.routeInfo,
+                onStartClick = onStartRide,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+            )
         }
     }
 }
@@ -124,6 +145,7 @@ private fun MapScreenPreview() {
         onStartSelected = {},
         onDestinationSelected = {},
         isPermissionGranted = true,
-        currentLocation = null
+        currentLocation = null,
+        onStartRide = {}
     )
 }

@@ -3,6 +3,7 @@ package com.`in`.routefinder.presentation.viewModel
 import com.google.android.gms.maps.model.LatLng
 import com.`in`.routefinder.core.domain.util.AppError
 import com.`in`.routefinder.presentation.model.LocationUi
+import com.`in`.routefinder.presentation.model.RouteInfoUi
 
 data class MapUiState(
     val startQuery: String = "",
@@ -21,7 +22,12 @@ data class MapUiState(
     val routePoints: List<LatLng> = emptyList(),
 
     val isLoading: Boolean = false,
-    val error: AppError? = null
+    val error: AppError? = null,
+
+    val routeInfo: RouteInfoUi? = null,
+    val isRouteStarted: Boolean = false,
+
+    val shouldStartTraversal: Boolean = false
 )
 
 enum class ActiveField {

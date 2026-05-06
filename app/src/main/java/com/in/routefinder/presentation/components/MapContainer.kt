@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
@@ -28,7 +29,8 @@ fun MapContainer(
     currentLocation: LatLng?,
     startLocation: LocationUi?,
     destinationLocation: LocationUi?,
-    routePoints: List<LatLng>
+    routePoints: List<LatLng>,
+    shouldStartTraversal: Boolean
 ) {
     // ---------------- MAP UI SETTINGS ----------------
     val mapUiSettings = remember {
@@ -83,7 +85,6 @@ fun MapContainer(
     }
 
     // ---------------- MOVE CAMERA TO CURRENT LOCATION ----------------
-
     LaunchedEffect(currentLocation) {
         currentLocation?.let {
             cameraPositionState.animate(
@@ -96,8 +97,39 @@ fun MapContainer(
         }
     }
 
-    // ---------------- ROUTE ANIMATION ----------------
+    // ---------------- CAMERA TO START LOCATION ----------------
+    LaunchedEffect(startLocation) {
+        startLocation?.let {
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(
+                    LatLng(it.lat, it.lng),
+                    15f
+                ),
+                durationMs = 800
+            )
+        }
+    }
+
+    // ---------------- FIT ROUTE BOUNDS ----------------
     LaunchedEffect(routePoints) {
+        if (routePoints.isEmpty()) return@LaunchedEffect
+        val boundsBuilder = LatLngBounds.builder()
+        routePoints.forEach {
+            boundsBuilder.include(it)
+        }
+        cameraPositionState.animate(
+            update = CameraUpdateFactory.newLatLngBounds(
+                boundsBuilder.build(),
+                120
+            ),
+            durationMs = 1000
+        )
+    }
+
+    // ---------------- ROUTE ANIMATION ----------------
+    LaunchedEffect(routePoints, shouldStartTraversal) {
+        if (!shouldStartTraversal) return@LaunchedEffect
+
         if (routePoints.size < 2) return@LaunchedEffect
         for (i in 0 until routePoints.lastIndex) {
             val start = routePoints[i]
@@ -131,6 +163,16 @@ fun MapContainer(
         uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState
     ) {
+        // ---------------- CURRENT LOCATION MARKER ----------------
+        currentLocation?.let {
+            Marker(
+                state = rememberUpdatedMarkerState(position = it),
+                title = "Current Location",
+                icon = BitmapDescriptorFactory.defaultMarker(
+                    BitmapDescriptorFactory.HUE_AZURE
+                )
+            )
+        }
 
         // ---------------- START MARKER ----------------
         startLocation?.let { start ->
