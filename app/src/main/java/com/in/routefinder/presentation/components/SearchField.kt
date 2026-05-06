@@ -10,10 +10,12 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.`in`.routefinder.ui.theme.colorAccent1
+import com.`in`.routefinder.ui.theme.colorPrimary
+import com.`in`.routefinder.ui.theme.colorPrimary1
+import com.`in`.routefinder.ui.theme.colorWhite
 
 @Composable
 fun SearchField(
@@ -23,7 +25,6 @@ fun SearchField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -37,11 +38,20 @@ fun SearchField(
                 contentDescription = null
             )
         },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(25f),
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
-            unfocusedContainerColor = Color.White,
-            focusedContainerColor = Color.White
+            unfocusedContainerColor = colorPrimary,
+            focusedContainerColor = colorPrimary,
+            unfocusedBorderColor = colorAccent1,
+            focusedBorderColor = colorWhite,
+            cursorColor = colorPrimary,
+            focusedLeadingIconColor = colorWhite,
+            unfocusedLeadingIconColor = colorWhite,
+            focusedTextColor = colorWhite,
+            unfocusedTextColor = colorWhite,
+            focusedPlaceholderColor = colorAccent1,
+            unfocusedPlaceholderColor = colorAccent1
         )
     )
 }

@@ -4,6 +4,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -12,22 +14,28 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
+import com.`in`.routefinder.R
 import com.`in`.routefinder.presentation.model.LocationUi
+import com.`in`.routefinder.ui.theme.colorPrimary
+import com.`in`.routefinder.ui.theme.colorWhite
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.atan2
@@ -42,7 +50,7 @@ fun MapContainer(
     routePoints: List<LatLng>,
     shouldStartTraversal: Boolean
 ) {
-
+    val context = LocalContext.current
     // ---------------- MAP SETTINGS ----------------
     val mapUiSettings = remember {
         MapUiSettings(
@@ -61,6 +69,10 @@ fun MapContainer(
         MapProperties(
             isMyLocationEnabled = isPermissionGranted,
             mapType = MapType.NORMAL,
+            mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
+                context,
+                R.raw.map_style_json
+            ),
             latLngBoundsForCameraTarget = LatLngBounds(
                 LatLng(8.07, 68.12),
                 LatLng(37.1, 97.42)
@@ -141,7 +153,6 @@ fun MapContainer(
 
     // ---------------- FIT ROUTE ----------------
     LaunchedEffect(routePoints) {
-
         if (routePoints.isEmpty()) return@LaunchedEffect
         val boundsBuilder = LatLngBounds.builder()
         routePoints.forEach {
@@ -226,16 +237,16 @@ fun MapContainer(
                     start.lat,
                     start.lng
                 ),
-                radius = 25.0,
-                fillColor = Color.DarkGray,
-                strokeColor = Color.DarkGray,
-                strokeWidth = 4f
+                radius = 30.0,
+                fillColor = colorWhite,
+                strokeColor = colorWhite,
+                strokeWidth = 5f
             )
         }
 
         // ---------------- DESTINATION ----------------
         destinationLocation?.let { destination ->
-            Marker(
+            MarkerComposable(
                 state = rememberUpdatedMarkerState(
                     position = LatLng(
                         destination.lat,
@@ -243,30 +254,44 @@ fun MapContainer(
                     )
                 ),
                 title = destination.name
-            )
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(40.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_marker),
+                    contentDescription = null,
+                    tint = colorWhite
+                )
+            }
         }
 
         // ---------------- ROUTE ----------------
         if (routePoints.isNotEmpty()) {
             Polyline(
                 points = routePoints,
-                width = 12f
+                width = 12f,
+                color = colorPrimary
             )
         }
 
         // ---------------- VEHICLE ----------------
         if (routePoints.isNotEmpty()) {
-            Marker(
+            MarkerComposable(
                 state = rememberUpdatedMarkerState(
                     position = animatedVehiclePosition
                 ),
                 title = "Vehicle",
                 rotation = vehicleRotation,
                 flat = true,
-//                icon = BitmapDescriptorFactory.fromResource(
-//                    R.drawable.ic_car
-//                )
-            )
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(50.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_navigation),
+                    contentDescription = null,
+                    tint = colorWhite
+                )
+            }
         }
     }
 }
