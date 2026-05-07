@@ -1,8 +1,10 @@
 package com.`in`.routefinder.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons.Default
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -37,6 +39,16 @@ fun SearchField(
                 contentDescription = null
             )
         },
+        trailingIcon = {
+            if (value.isNotEmpty()) {
+                Icon(
+                    modifier = Modifier
+                        .clickable { onValueChange("") },
+                    imageVector = Default.Cancel,
+                    contentDescription = null,
+                )
+            }
+        },
         shape = RoundedCornerShape(25f),
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
@@ -50,7 +62,9 @@ fun SearchField(
             focusedTextColor = colorWhite,
             unfocusedTextColor = colorWhite,
             focusedPlaceholderColor = colorAccent1,
-            unfocusedPlaceholderColor = colorAccent1
+            unfocusedPlaceholderColor = colorAccent1,
+            focusedTrailingIconColor = colorWhite,
+            unfocusedTrailingIconColor = colorAccent1
         )
     )
 }

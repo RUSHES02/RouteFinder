@@ -68,7 +68,8 @@ fun MapScreen(
 
         // ---------------- OVERLAY CONTENT ----------------
         AnimatedContent(
-            targetState = state.shouldStartTraversal,
+            targetState =  state.selectedStart != null &&
+                    state.selectedDestination != null,
             transitionSpec = {
                 slideInVertically(
                     initialOffsetY = { fullHeight ->
