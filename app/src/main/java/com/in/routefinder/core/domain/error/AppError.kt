@@ -1,4 +1,4 @@
-package com.`in`.routefinder.core.domain.util
+package com.`in`.routefinder.core.domain.error
 
 import com.`in`.routefinder.core.networking.ApiErrorDetail
 

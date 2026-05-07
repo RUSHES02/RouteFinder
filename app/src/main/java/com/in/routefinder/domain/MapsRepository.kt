@@ -1,7 +1,7 @@
 package com.`in`.routefinder.domain
 
-import com.`in`.routefinder.core.domain.util.AppError
-import com.`in`.routefinder.core.domain.util.Response
+import com.`in`.routefinder.core.domain.error.AppError
+import com.`in`.routefinder.core.domain.result.Response
 import com.`in`.routefinder.domain.model.Location
 import com.`in`.routefinder.domain.model.Route
 

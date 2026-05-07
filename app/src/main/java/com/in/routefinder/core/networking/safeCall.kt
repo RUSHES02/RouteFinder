@@ -1,6 +1,6 @@
 package com.`in`.routefinder.core.networking
 
-import com.`in`.routefinder.core.domain.util.Response
+import com.`in`.routefinder.core.domain.result.Response
 import io.ktor.client.statement.HttpResponse
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.currentCoroutineContext

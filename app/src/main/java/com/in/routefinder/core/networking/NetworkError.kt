@@ -1,14 +1,14 @@
 package com.`in`.routefinder.core.networking
 
-import com.`in`.routefinder.core.domain.util.AppError
-import com.`in`.routefinder.core.domain.util.AppError.Forbidden
-import com.`in`.routefinder.core.domain.util.AppError.NoInternet
-import com.`in`.routefinder.core.domain.util.AppError.NotFound
-import com.`in`.routefinder.core.domain.util.AppError.Serialization
-import com.`in`.routefinder.core.domain.util.AppError.Server
-import com.`in`.routefinder.core.domain.util.AppError.Unauthorized
-import com.`in`.routefinder.core.domain.util.AppError.Unknown
-import com.`in`.routefinder.core.domain.util.MyError
+import com.`in`.routefinder.core.domain.error.AppError
+import com.`in`.routefinder.core.domain.error.AppError.Forbidden
+import com.`in`.routefinder.core.domain.error.AppError.NoInternet
+import com.`in`.routefinder.core.domain.error.AppError.NotFound
+import com.`in`.routefinder.core.domain.error.AppError.Serialization
+import com.`in`.routefinder.core.domain.error.AppError.Server
+import com.`in`.routefinder.core.domain.error.AppError.Unauthorized
+import com.`in`.routefinder.core.domain.error.AppError.Unknown
+import com.`in`.routefinder.core.domain.error.MyError
 
 sealed class NetworkError: MyError {
 

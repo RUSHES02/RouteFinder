@@ -1,9 +1,9 @@
 package com.`in`.routefinder.data.repository
 
-import com.`in`.routefinder.core.domain.util.AppError
-import com.`in`.routefinder.core.domain.util.Response
-import com.`in`.routefinder.core.domain.util.map
-import com.`in`.routefinder.core.domain.util.mapToAppError
+import com.`in`.routefinder.core.domain.error.AppError
+import com.`in`.routefinder.core.domain.result.Response
+import com.`in`.routefinder.core.domain.result.map
+import com.`in`.routefinder.core.domain.result.mapToAppError
 import com.`in`.routefinder.core.networking.toAppError
 import com.`in`.routefinder.data.remote.GoogleMapsDataSource
 import com.`in`.routefinder.data.remote.util.PolylineUtils

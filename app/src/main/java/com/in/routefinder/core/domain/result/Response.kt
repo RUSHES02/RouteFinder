@@ -1,5 +1,7 @@
-package com.`in`.routefinder.core.domain.util
+package com.`in`.routefinder.core.domain.result
 
+import com.`in`.routefinder.core.domain.error.AppError
+import com.`in`.routefinder.core.domain.error.MyError
 import com.`in`.routefinder.core.networking.NetworkError
 
 

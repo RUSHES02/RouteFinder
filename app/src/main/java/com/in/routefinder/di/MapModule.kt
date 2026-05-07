@@ -5,8 +5,8 @@ import com.`in`.routefinder.core.networking.HttpClientFactory
 import com.`in`.routefinder.data.remote.GoogleMapsDataSource
 import com.`in`.routefinder.data.repository.MapsRepositoryImpl
 import com.`in`.routefinder.domain.MapsRepository
-import com.`in`.routefinder.presentation.utils.CurrentLocationProvider
-import com.`in`.routefinder.presentation.utils.CurrentLocationProviderImpl
+import com.`in`.routefinder.core.location.CurrentLocationProvider
+import com.`in`.routefinder.core.location.CurrentLocationProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -14,7 +14,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.logging.LoggingFormat
 import jakarta.inject.Singleton
 
 @Module

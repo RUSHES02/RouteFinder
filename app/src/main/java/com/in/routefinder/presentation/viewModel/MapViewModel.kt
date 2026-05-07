@@ -3,12 +3,12 @@ package com.`in`.routefinder.presentation.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.`in`.routefinder.core.domain.util.Response
+import com.`in`.routefinder.core.domain.result.Response
 import com.`in`.routefinder.domain.MapsRepository
 import com.`in`.routefinder.presentation.mapper.toDomain
 import com.`in`.routefinder.presentation.mapper.toUi
 import com.`in`.routefinder.presentation.model.LocationUi
-import com.`in`.routefinder.presentation.utils.CurrentLocationProvider
+import com.`in`.routefinder.core.location.CurrentLocationProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.FlowPreview

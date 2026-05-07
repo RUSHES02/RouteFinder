@@ -1,4 +1,4 @@
-package com.`in`.routefinder.presentation.utils
+package com.`in`.routefinder.core.location
 
 import android.annotation.SuppressLint
 import android.content.Context

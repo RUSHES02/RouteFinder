@@ -1,7 +1,6 @@
 package com.`in`.routefinder.data.remote
 
-import com.`in`.routefinder.core.domain.util.Response
-import com.`in`.routefinder.core.networking.HttpClientFactory
+import com.`in`.routefinder.core.domain.result.Response
 import com.`in`.routefinder.core.networking.NetworkError
 import com.`in`.routefinder.core.networking.constructUrl
 import com.`in`.routefinder.core.networking.safeCall

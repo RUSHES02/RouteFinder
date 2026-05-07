@@ -1,7 +1,7 @@
 package com.`in`.routefinder.presentation.viewModel
 
 import com.google.android.gms.maps.model.LatLng
-import com.`in`.routefinder.core.domain.util.AppError
+import com.`in`.routefinder.core.domain.error.AppError
 import com.`in`.routefinder.presentation.model.LocationUi
 import com.`in`.routefinder.presentation.model.RouteInfoUi
 
