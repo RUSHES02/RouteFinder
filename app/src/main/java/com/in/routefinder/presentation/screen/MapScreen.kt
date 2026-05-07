@@ -35,6 +35,8 @@ fun MapScreen(
     state: MapUiState,
     isPermissionGranted: Boolean,
     currentLocation: LatLng?,
+    onSearchFocusChanged: (Boolean) -> Unit,
+    onActiveFieldChanged: (ActiveField) -> Unit,
     onStartQueryChange: (String) -> Unit,
     onDestinationQueryChange: (String) -> Unit,
     onStartSelected: (LocationUi) -> Unit,
@@ -91,8 +93,10 @@ fun MapScreen(
                     // ---------------- SEARCH CARD ----------------
                     SearchCard(
                         state = state,
+                        onActiveFieldChanged = onActiveFieldChanged,
                         onStartQueryChange = onStartQueryChange,
                         onDestinationQueryChange = onDestinationQueryChange,
+                        onSearchFocusChanged = onSearchFocusChanged,
                         modifier = Modifier
                             .padding(
                                 horizontal = 16.dp,
@@ -103,7 +107,6 @@ fun MapScreen(
                     // ---------------- SUGGESTIONS ----------------
                     val suggestions =
                         when (state.activeField) {
-
                             ActiveField.START ->
                                 state.startSuggestions
 
@@ -111,13 +114,29 @@ fun MapScreen(
                                 state.destinationSuggestions
                         }
 
+                    val suggestionsWithCurrentLocation = buildList {
+                        currentLocation?.let {
+                            add(
+                                LocationUi(
+                                    id = "current_location",
+                                    name = "Current Location",
+                                    address = "Use your current location",
+                                    lat = it.latitude,
+                                    lng = it.longitude,
+                                    isCurrentLocation = true
+                                )
+                            )
+                        }
+                        addAll(suggestions)
+                    }
                     AnimatedVisibility(
-                        visible = suggestions.isNotEmpty(),
+                        visible = state.isSearchFocused &&
+                                suggestionsWithCurrentLocation.isNotEmpty(),
                         enter = fadeIn() + expandVertically(),
                         exit = fadeOut() + shrinkVertically()
                     ) {
                         SuggestionsSheet(
-                            suggestions = suggestions,
+                            suggestions = suggestionsWithCurrentLocation,
                             onItemClick = { location ->
                                 keyboardController?.hide()
                                 when (state.activeField) {
@@ -190,6 +209,8 @@ private fun MapScreenPreview() {
         isPermissionGranted = true,
         currentLocation = null,
         onStartRide = {},
-        onResetRoute = {}
+        onResetRoute = {},
+        onSearchFocusChanged = {},
+        onActiveFieldChanged = {}
     )
 }

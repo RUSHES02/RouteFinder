@@ -10,6 +10,7 @@ data class MapUiState(
     val destinationQuery: String = "",
 
     val activeField: ActiveField = ActiveField.START,
+    val isSearchFocused: Boolean = false,
 
     val startSuggestions: List<LocationUi> = emptyList(),
     val destinationSuggestions: List<LocationUi> = emptyList(),

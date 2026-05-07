@@ -105,6 +105,25 @@ class MapViewModel @Inject constructor(
     // -------------------------
     // INPUT HANDLERS
     // -------------------------
+    fun onSearchFocusChanged(
+        isFocused: Boolean,
+    ) {
+        _state.update {
+            it.copy(
+                isSearchFocused = isFocused
+            )
+        }
+    }
+
+    fun onActiveFieldChanged(
+        field: ActiveField
+    ) {
+        _state.update {
+            it.copy(
+                activeField = field
+            )
+        }
+    }
 
     fun onStartQueryChange(query: String) {
         _state.update {
@@ -130,12 +149,64 @@ class MapViewModel @Inject constructor(
     // SELECTION
     // -------------------------
 
-    fun onStartSelected(location: LocationUi) {
-        fetchDetails(location, isStart = true)
+    fun onStartSelected(
+        location: LocationUi
+    ) {
+        // ---------------- CURRENT LOCATION ---------------
+        if (location.isCurrentLocation) {
+            _state.update {
+                it.copy(
+                    activeField = ActiveField.START,
+                    selectedStart = location,
+                    startSuggestions = emptyList(),
+                    startQuery = location.name,
+                    isSearchFocused = false
+                )
+            }
+            checkAndFetchRoute()
+            return
+        }
+
+        // ---------------- NORMAL LOCATION ----------------
+        _state.update {
+            it.copy(
+                selectedStart = location,
+                startQuery = location.name,
+                startSuggestions = emptyList(),
+                isSearchFocused = false
+            )
+        }
+        fetchDetails(location = location, isStart = true)
     }
 
-    fun onDestinationSelected(location: LocationUi) {
-        fetchDetails(location, isStart = false)
+    fun onDestinationSelected(
+        location: LocationUi
+    ) {
+        // ---------------- CURRENT LOCATION ----------------
+        if (location.isCurrentLocation) {
+            _state.update {
+                it.copy(
+                    activeField = ActiveField.DESTINATION,
+                    selectedDestination = location,
+                    destinationSuggestions = emptyList(),
+                    destinationQuery = location.name,
+                    isSearchFocused = false
+                )
+            }
+            checkAndFetchRoute()
+            return
+        }
+
+        // ---------------- NORMAL LOCATION ----------------
+        _state.update {
+            it.copy(
+                selectedDestination = location,
+                destinationQuery = location.name,
+                destinationSuggestions = emptyList(),
+                isSearchFocused = false
+            )
+        }
+        fetchDetails(location = location, isStart = false)
     }
 
     private fun fetchDetails(location: LocationUi, isStart: Boolean) {

@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import com.`in`.routefinder.ui.theme.colorAccent1
 import com.`in`.routefinder.ui.theme.colorPrimary
-import com.`in`.routefinder.ui.theme.colorPrimary1
 import com.`in`.routefinder.ui.theme.colorWhite
 
 @Composable
@@ -45,9 +44,9 @@ fun SearchField(
             focusedContainerColor = colorPrimary,
             unfocusedBorderColor = colorAccent1,
             focusedBorderColor = colorWhite,
-            cursorColor = colorPrimary,
+            cursorColor = colorWhite,
             focusedLeadingIconColor = colorWhite,
-            unfocusedLeadingIconColor = colorWhite,
+            unfocusedLeadingIconColor = colorAccent1,
             focusedTextColor = colorWhite,
             unfocusedTextColor = colorWhite,
             focusedPlaceholderColor = colorAccent1,

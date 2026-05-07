@@ -5,5 +5,6 @@ data class LocationUi(
     val name: String,
     val address: String,
     val lat: Double,
-    val lng: Double
+    val lng: Double,
+    val isCurrentLocation: Boolean = false
 )

@@ -199,7 +199,7 @@
         "elementType": "labels.icon",
         "stylers": [
             {
-                "visibility": "on"
+                "visibility": "off"
             }
         ]
     },
@@ -263,6 +263,9 @@
             },
             {
                 "lightness": 19
+            },
+            {
+                "visibility": "off"
             }
         ]
     },

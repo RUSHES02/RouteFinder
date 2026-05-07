@@ -3,14 +3,18 @@ package com.`in`.routefinder.presentation.components
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TripOrigin
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -23,7 +27,6 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -168,6 +171,17 @@ fun MapContainer(
     }
 
     // ---------------- ROUTE TRAVERSAL ----------------
+    val routeStartPoint = remember(routePoints) {
+        routePoints.firstOrNull()
+    }
+
+    val routeEndPoint = remember(routePoints) {
+        routePoints.lastOrNull()
+    }
+    var isTraversalCompleted by remember {
+        mutableStateOf(false)
+    }
+
     LaunchedEffect(
         routePoints,
         shouldStartTraversal
@@ -175,7 +189,7 @@ fun MapContainer(
         if (!shouldStartTraversal) return@LaunchedEffect
 
         if (routePoints.size < 2) return@LaunchedEffect
-
+        isTraversalCompleted = false
         for (i in 0 until routePoints.lastIndex) {
 
             val start = routePoints[i]
@@ -208,6 +222,7 @@ fun MapContainer(
                 }
             }
         }
+        isTraversalCompleted = true
     }
 
     // ---------------- CAMERA FOLLOW ----------------
@@ -227,31 +242,44 @@ fun MapContainer(
         modifier = modifier.fillMaxSize(),
         properties = mapProperties,
         uiSettings = mapUiSettings,
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+        contentPadding = PaddingValues(
+            top = 250.dp,
+            bottom = 150.dp
+        )
     ) {
 
         // ---------------- START LOCATION ----------------
         startLocation?.let { start ->
-            Circle(
-                center = LatLng(
-                    start.lat,
-                    start.lng
+            MarkerComposable(
+                state = rememberUpdatedMarkerState(
+                    position = routeStartPoint
+                        ?: LatLng(
+                            start.lat,
+                            start.lng
+                        )
                 ),
-                radius = 30.0,
-                fillColor = colorWhite,
-                strokeColor = colorWhite,
-                strokeWidth = 5f
-            )
+                title = start.name
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(25.dp),
+                    imageVector = Icons.Default.TripOrigin,
+                    contentDescription = null,
+                    tint = colorWhite
+                )
+            }
         }
 
         // ---------------- DESTINATION ----------------
         destinationLocation?.let { destination ->
             MarkerComposable(
                 state = rememberUpdatedMarkerState(
-                    position = LatLng(
-                        destination.lat,
-                        destination.lng
-                    )
+                    position = routeEndPoint
+                        ?: LatLng(
+                            destination.lat,
+                            destination.lng
+                        )
                 ),
                 title = destination.name
             ) {
@@ -275,7 +303,7 @@ fun MapContainer(
         }
 
         // ---------------- VEHICLE ----------------
-        if (routePoints.isNotEmpty()) {
+        if (routePoints.isNotEmpty() && shouldStartTraversal && !isTraversalCompleted) {
             MarkerComposable(
                 state = rememberUpdatedMarkerState(
                     position = animatedVehiclePosition

@@ -65,6 +65,8 @@ fun AppNavHost(
 
             MapScreen(
                 state = state,
+                onSearchFocusChanged = viewModel::onSearchFocusChanged,
+                onActiveFieldChanged = viewModel::onActiveFieldChanged,
                 onStartQueryChange = viewModel::onStartQueryChange,
                 onDestinationQueryChange = viewModel::onDestinationQueryChange,
                 onStartSelected = viewModel::onStartSelected,

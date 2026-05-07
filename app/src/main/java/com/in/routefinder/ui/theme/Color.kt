@@ -12,3 +12,5 @@ val colorWhite = Color(0xFFFFFFFF)
 val colorBlack = Color(0xFF000000)
 
 val colorTransparent = Color(0x00000000)
+
+val colorHighlight = Color(0xFF4285F4)

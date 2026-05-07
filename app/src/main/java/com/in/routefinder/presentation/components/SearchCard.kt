@@ -14,8 +14,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.`in`.routefinder.presentation.viewModel.ActiveField
 import com.`in`.routefinder.presentation.viewModel.MapUiState
 import com.`in`.routefinder.ui.theme.colorPrimary
 import com.`in`.routefinder.ui.theme.colorWhite
@@ -23,9 +25,11 @@ import com.`in`.routefinder.ui.theme.colorWhite
 @Composable
 fun SearchCard(
     state: MapUiState,
+    onActiveFieldChanged: (ActiveField) -> Unit,
     onStartQueryChange: (String) -> Unit,
     onDestinationQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSearchFocusChanged: (Boolean) -> Unit
 ) {
 
     ElevatedCard(
@@ -48,7 +52,17 @@ fun SearchCard(
                 value = state.startQuery,
                 placeholder = "Starting point",
                 leadingIcon = Icons.Default.MyLocation,
-                onValueChange = onStartQueryChange
+                onValueChange = onStartQueryChange,
+                modifier = Modifier.onFocusChanged {
+                    onSearchFocusChanged(
+                        it.isFocused
+                    )
+                    if (it.isFocused) {
+                        onActiveFieldChanged(
+                            ActiveField.START
+                        )
+                    }
+                }
             )
 
             HorizontalDivider(color = colorWhite)
@@ -57,7 +71,17 @@ fun SearchCard(
                 value = state.destinationQuery,
                 placeholder = "Where to?",
                 leadingIcon = Icons.Default.LocationOn,
-                onValueChange = onDestinationQueryChange
+                onValueChange = onDestinationQueryChange,
+                modifier = Modifier.onFocusChanged {
+                    onSearchFocusChanged(
+                        it.isFocused
+                    )
+                    if (it.isFocused) {
+                        onActiveFieldChanged(
+                            ActiveField.DESTINATION
+                        )
+                    }
+                }
             )
         }
     }
@@ -69,6 +93,8 @@ private fun SearchCardPreview() {
     SearchCard(
         state = MapUiState(),
         onStartQueryChange = {},
-        onDestinationQueryChange = {}
+        onDestinationQueryChange = {},
+        onSearchFocusChanged = {},
+        onActiveFieldChanged = {}
     )
 }
