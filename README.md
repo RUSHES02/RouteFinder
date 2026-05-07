@@ -114,7 +114,7 @@ Responsible for:
 ## Home / Search Screen
 
 <p align="center">
-  <img src="screenshots/search_screen.png" width="250"/>
+  <img src="screenshots/search_screen.jpg" width="250"/>
 </p>
 
 ---
@@ -122,7 +122,7 @@ Responsible for:
 ## Route Preview
 
 <p align="center">
-  <img src="screenshots/route_preview.png" width="250"/>
+  <img src="screenshots/route_preview.jpg" width="250"/>
 </p>
 
 ---
@@ -130,7 +130,7 @@ Responsible for:
 ## Ride Traversal
 
 <p align="center">
-  <img src="screenshots/ride_traversal.png" width="250"/>
+  <img src="screenshots/ride_traversal.jpg" width="250"/>
 </p>
 
 ---
